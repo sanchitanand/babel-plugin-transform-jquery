@@ -3,13 +3,18 @@
   "version": "1.0.0",
   "description": "Transforms jQuery methods and calls into vanilla JS",
   "main": "lib/index.js",
+  "files":[
+    "lib/",
+    "README.md"
+  ],
   "scripts": {
+    "prepublish": "npm run build",
     "build": "babel src -d lib",
     "test": "mocha -r babel-register test/index.js"
   },
   "repository": {
     "type": "git",
-    "url": "http://github.com/sanchitanand"
+    "url": "https://github.com/sanchitanand/babel-plugin-transform-jquery.git"
   },
   "author": "Sanchit Anand",
   "license": "MIT",
