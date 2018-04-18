@@ -154,8 +154,8 @@ class jQuery_lookup
         }
         if (args.length == 0)
         {
-            const statement = template(`var TEMP = "";
-            for(i=0;i<REFVAR.length;i++){
+            const statement = template(`var TEMP = '';
+            for(var i=0;i<REFVAR.length;i++){
                 TEMP += REFVAR[i].textContent;
             }
             REFVAR = TEMP;
@@ -168,7 +168,7 @@ class jQuery_lookup
         }
         else if (args.length == 1)
         {
-            const statement = template(`for(i=0;i<REFVAR.length;i++){
+            const statement = template(`for(var i=0;i<REFVAR.length;i++){
                                         REFVAR[i].textContent = ARGS0
                                         }`);
             const ast = statement({
@@ -198,7 +198,7 @@ class jQuery_lookup
         {
             if (t.isIdentifier(args[0]) || t.isFunctionExpression(args[0]))
             {
-                const statement = template(`for(i=0;i<REFVAR.length;i++){
+                const statement = template(`for(var i=0;i<REFVAR.length;i++){
                 REFVAR[i].addEventListener('click', FUNC);
                 }`);
                 const ast = statement({
@@ -234,7 +234,7 @@ class jQuery_lookup
         }
         if (args.length == 2)
         {
-            const statement = template(`for(i=0;i<REFVAR.length;i++){
+            const statement = template(`for(var i=0;i<REFVAR.length;i++){
                                         REFVAR[i].addEventListener(ARGS0,ARGS1);
                                         }`);
         }
@@ -243,10 +243,10 @@ class jQuery_lookup
         {
             //TODO: add child element type
             const statement = template(`var TEMP = ARGS2;
-                                        for(i=0;i<REFVAR.length;i++){
+                                        for(var i=0;i<REFVAR.length;i++){
                                         REFVAR[i].addEventListener(ARGS0,function(event){
                                             var TEMP2 = document.querySelectorAll(ARGS1);
-                                            for(i=0;i< TEMP2.length;i++)
+                                            for(var i=0;i< TEMP2.length;i++)
                                             {
                                                 if(event.target === TEMP2[i])
                                                 {
@@ -309,7 +309,7 @@ class jQuery_lookup
         {
             if (t.isStringLiteral(args[0]) && t.isStringLiteral(args[1]))
             {
-                const statement = template(`for(i=0;i<REFVAR.length;i++){
+                const statement = template(`for(var i=0;i<REFVAR.length;i++){
                 REFVAR[i].style.setProperty(ARGS0,ARGS1);
                 }`);
                 const ast = statement({
