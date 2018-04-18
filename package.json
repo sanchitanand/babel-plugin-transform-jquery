@@ -5,8 +5,7 @@
   "main": "lib/index.js",
   "scripts": {
     "build": "babel src -d lib",
-    "lint": "eslint src",
-    "test": "node -r babel-register test/index.js"
+    "test": "mocha -r babel-register test/index.js"
   },
   "repository": {
     "type": "git",
@@ -19,6 +18,7 @@
     "babel-core": "^6.26.0",
     "babel-preset-env": "^1.6.1",
     "babel-register": "^6.26.0",
+    "chai": "^4.1.2",
     "mocha": "^5.1.0"
   },
   "dependencies": {
