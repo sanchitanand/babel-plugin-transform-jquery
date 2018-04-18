@@ -1,6 +1,5 @@
 import assert from 'assert';
+import babelPluginTransformjQuery from '../src';
+import * as babel from 'babel-core';
 
-describe("Basic Functionality", function()
-{
-
-});
+console.log(typeof  babelPluginTransformjQuery);
