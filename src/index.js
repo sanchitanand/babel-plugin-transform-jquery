@@ -1,27 +1,30 @@
 import * as util from './util.js';
 import {types as t} from 'babel-core';
-export default function()
+
+export default function ()
 {
 
 
-    function destructChain(path,arr,lookup, refVar)
+    function destructChain(path, arr, lookup, refVar)
     {
         if (!arr)
-           var arr = [];
-        if(t.isCallExpression(path.node))
         {
-            if(t.isIdentifier(path.node.callee,{name:"$"}))
+            var arr = [];
+        }
+        if (t.isCallExpression(path.node))
+        {
+            if (t.isIdentifier(path.node.callee, {name: "$"}))
             {
-                if(!refVar)
+                if (!refVar)
                 {
-                    let ast = lookup.$(path,path.node.arguments);
+                    let ast = lookup.$(path, path.node.arguments);
                     arr.push(ast);
                     refVar = ast.declarations[0].id;
                     return refVar;
                 }
                 else
                 {
-                    let ast = lookup.$(path,path.node.arguments,refVar);
+                    let ast = lookup.$(path, path.node.arguments, refVar);
                     arr.push(ast);
                     return refVar;
                 }
@@ -82,78 +85,79 @@ export default function()
     }
 
 
-
     return {
-      name : "ast-transform",
-      visitor: {
+        name: "ast-transform",
+        visitor: {
 
-          ExpressionStatement : function(path,state)
-          {
-              if(!this._lookup)
-              {
-                  this._lookup = util.createLookup(state.opts.naming);
-              }
-              if(t.isCallExpression(path.node.expression))
-              {
-                  let new_statements = [];
-                  let refVar = destructChain(path.get("expression"), new_statements,this._lookup);
-                  if (!refVar)
-                  {
-                      return;
-                  }
+            ExpressionStatement: function (path, state)
+            {
+                if (!this._lookup)
+                {
+                    this._lookup = util.createLookup(state.opts.naming);
+                }
+                if (t.isCallExpression(path.node.expression))
+                {
+                    let new_statements = [];
+                    let refVar = destructChain(path.get("expression"), new_statements, this._lookup);
+                    if (!refVar)
+                    {
+                        return;
+                    }
 
-                  path.replaceWithMultiple(new_statements);
-                  path.skip();
-              }
-              else if (t.isAssignmentExpression(path.node.expression) && path.node.expression.operator === "=" && t.isCallExpression(path.node.expression.right))
-              {
-                  let new_statements = [];
-                  let refVar = destructChain(path.get("expression").get("right"),new_statements, this._lookup, path.node.expression.left);
-                  if(!refVar)
-                  {
-                      return;
-                  }
-                  path.replaceWithMultiple(new_statements);
-                  path.skip();
+                    path.replaceWithMultiple(new_statements);
+                    path.skip();
+                }
+                else if (t.isAssignmentExpression(path.node.expression) && path.node.expression.operator === "=" && t.isCallExpression(path.node.expression.right))
+                {
+                    let new_statements = [];
+                    let refVar = destructChain(path.get("expression").get("right"), new_statements, this._lookup, path.node.expression.left);
+                    if (!refVar)
+                    {
+                        return;
+                    }
+                    path.replaceWithMultiple(new_statements);
+                    path.skip();
 
 
-              }
-          },
-          VariableDeclarator: function(path,state)
-          {
-              if(!this._lookup)
-              {
-                  this._lookup = util.createLookup(state.opts.naming);
-              }
-              if(t.isCallExpression(path.node.init))
-              {
-                  let new_statements = [];
-                  let refVar = destructChain(path.get('init'),new_statements,this._lookup ,path.node.id);
-                  if(!refVar)
-                  {
-                      return;
-                  }
-                  const stmt = t.variableDeclarator(path.node.id);
-                  path.parentPath.insertAfter(new_statements);
-                  path.replaceWith(stmt);
-                  path.skip();
+                }
+            },
+            VariableDeclarator: function (path, state)
+            {
+                if (!this._lookup)
+                {
+                    this._lookup = util.createLookup(state.opts.naming);
+                }
+                if (t.isCallExpression(path.node.init))
+                {
+                    let new_statements = [];
+                    let refVar = destructChain(path.get('init'), new_statements, this._lookup, path.node.id);
+                    if (!refVar)
+                    {
+                        return;
+                    }
+                    const stmt = t.variableDeclarator(path.node.id);
+                    path.parentPath.insertAfter(new_statements);
+                    path.replaceWith(stmt);
+                    path.skip();
 
-              }
-          },
-          CallExpression: function(path,state)
-          {
-              if(!this._lookup)
-              {
-                  this._lookup = util.createLookup(state.opts.naming);
-              }
-              let new_statements = [];
-              let refVar = destructChain(path, new_statements, this._lookup);
-              if(!refVar)
-                  return;
-              path.getStatementParent().insertBefore(new_statements);
-              path.replaceWith(refVar);
+                }
+            },
+            CallExpression: function (path, state)
+            {
+                if (!this._lookup)
+                {
+                    this._lookup = util.createLookup(state.opts.naming);
+                }
+                let new_statements = [];
+                let refVar = destructChain(path, new_statements, this._lookup);
+                if (!refVar)
+                {
+                    return;
+                }
+                path.getStatementParent().insertBefore(new_statements);
+                path.replaceWith(refVar);
 
-          }
-      }
+            }
+        }
     };
 };
