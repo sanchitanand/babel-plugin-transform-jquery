@@ -3,6 +3,9 @@
   "version": "1.0.1",
   "description": "Transforms jQuery methods and calls into vanilla JS",
   "main": "lib/index.js",
+  "keywords": [
+    "babel-plugin"
+  ],
   "files":[
     "lib/",
     "README.md"

@@ -4,7 +4,42 @@
 
 
 Babel Plugin that converts jQuery code into vanilla JS.
-Currently supported conversions :
+
+
+## Installation
+
+```sh
+npm install --save-dev babel-plugin-transform-jquery
+```
+
+## Usage
+
+### Via `.babelrc`
+
+**.babelrc**
+
+```json
+{
+  "plugins": ["babel-plugin-transform-jquery"]
+}
+```
+
+### Via CLI
+
+```sh
+babel --plugins babel-plugin-transform-jquery script.js
+```
+
+### Via Node API
+
+```javascript
+require("@babel/core").transform("code", {
+  plugins: ["babel-plugin-transform-jquery"]
+});
+```
+
+##Currently Support properties
+
 - text()
 - css()
 - click()
