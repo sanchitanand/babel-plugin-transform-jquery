@@ -151,6 +151,7 @@ class jQuery_lookup
         if (!refVar)
         {
             //TODO:error code
+            throw path.buildCodeFrameError("Unexpected parsing error");
         }
         if (args.length == 0)
         {
@@ -189,28 +190,38 @@ class jQuery_lookup
         if (!refVar)
         {
             //TODO:error code
+            throw path.buildCodeFrameError("Unexpected parsing error");
         }
         if (args.length == 0)
         {
             //TODO:trigger click
+            const statement = template(`for(var i=0;i<REFVAR.length;i++){
+            REFVAR[i].click();
+            }`);
+            const ast = statement({
+                REFVAR: refVar
+            });
+            return ast;
         }
         else if (args.length == 1)
         {
-            if (t.isIdentifier(args[0]) || t.isFunctionExpression(args[0]))
-            {
-                const statement = template(`for(var i=0;i<REFVAR.length;i++){
-                REFVAR[i].addEventListener('click', FUNC);
-                }`);
-                const ast = statement({
-                    REFVAR: refVar,
-                    FUNC: args[0]
-                });
-                return ast;
-            }
-            else
-            {
-                throw path.buildCodeFrameError("Unexpected argument passed");
-            }
+
+            return this.on(path,[t.stringLiteral('click'),args[0]],refVar);
+            // if (t.isIdentifier(args[0]) || t.isFunctionExpression(args[0]))
+            // {
+            //     const statement = template(`for(var i=0;i<REFVAR.length;i++){
+            //     REFVAR[i].addEventListener('click', FUNC);
+            //     }`);
+            //     const ast = statement({
+            //         REFVAR: refVar,
+            //         FUNC: args[0]
+            //     });
+            //     return ast;
+            // }
+            // else
+            // {
+            //     throw path.buildCodeFrameError("Unexpected argument passed");
+            // }
 
         }
         else if (args.length == 2)
@@ -226,17 +237,35 @@ class jQuery_lookup
     }
 
     //TODO: compatibility
+
+    //WARNING: DOES NOT PLAY WELL WITH JQUERY EVENTS. DO NOT MIX AND MATCH.
     on(path, args, refVar)
     {
         if (!refVar)
         {
             //TODO:error code
+            throw path.buildCodeFrameError("Unexpected parsing error");
         }
         if (args.length == 2)
         {
-            const statement = template(`for(var i=0;i<REFVAR.length;i++){
+            if(t.isStringLiteral(args[0]) && (t.isFunctionExpression(args[1]) || t.isIdentifier(args[1])))
+            {
+                const statement = template(`for(var i=0;i<REFVAR.length;i++){
                                         REFVAR[i].addEventListener(ARGS0,ARGS1);
                                         }`);
+
+                const ast = statement({
+                    REFVAR: refVar,
+                    ARGS0: args[0],
+                    ARGS1: args[1]
+                });
+                return ast;
+            }
+
+            else
+            {
+                throw path.buildCodeFrameError('Unexpected argument passed');
+            }
         }
 
         else if (args.length == 3)
@@ -279,6 +308,7 @@ class jQuery_lookup
         if (!refVar)
         {
             //TODO:error code
+            throw path.buildCodeFrameError("Unexpected parsing error");
         }
         if (args.length == 1)
         {
@@ -336,6 +366,7 @@ class jQuery_lookup
         if (!refVar)
         {
             //TODO: Error Code
+            throw path.buildCodeFrameError("Unexpected parsing error");
         }
         if (args.length == 0)
         {

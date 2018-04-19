@@ -148,6 +148,86 @@ describe("1. Can do basic DOM manipulation", function ()
             done();
         });
     });
+
+    describe("1.4. click()",function(){
+        it('1.4.1. sets a click callback on a single DOM element, returns the DOM element', function (done)
+        {
+            document.body.innerHTML = '<button>Click me!</button>';
+            var out = babel.transform("var testVar = $('button').click(function(){  " +
+                "$(this).text('Clicked');" +
+                "});" , {
+               plugins:[babelPluginTransformjQuery]
+            });
+            expect(eval(out.code.replace(/\r?\n|\r/g, "") + "testVar;")).eql($('button'));
+            $('button').click();
+            expect($('button').text()).eql("Clicked");
+            done();
+        });
+
+        it('1.4.2. sets a click callback on multiple DOM elements, returns array of DOM elements', function (done)
+        {
+            document.body.innerHTML = '<button id="1">Click me!</button><button id="2">Click me too!</button>';
+            var out = babel.transform("var testVar = $('button').click(function(){  " +
+                "$(this).text('Clicked');" +
+                "});" , {
+                plugins:[babelPluginTransformjQuery]
+            });
+            expect(eval(out.code.replace(/\r?\n|\r/g, "") + "testVar;")).eql($('button'));
+            $('button').click();
+            expect($('#1').text()).eql("Clicked");
+            expect($('#2').text()).eql("Clicked");
+            done();
+        });
+
+        it('1.4.3. triggers click callback on single element', function (done)
+        {
+            document.body.innerHTML = '<button>Click me!</button>';
+            $("button").click(function(){
+                $(this).text("Clicked");
+            });
+            var out = babel.transform("$('button').click();" , {
+                plugins:[babelPluginTransformjQuery]
+            });
+            eval(out.code.replace(/\r?\n|\r/g, ""));
+            expect($('button').text()).eql("Clicked");
+            done();
+        });
+
+        it('1.4.4. triggers click callback on multiple elements', function (done)
+        {
+            document.body.innerHTML = '<button id="1">Click me!</button><button id="2">Click me too!</button>';
+            $("button").click(function(){
+                $(this).text("Clicked");
+            });
+            var out = babel.transform("$('button').click();" , {
+                plugins:[babelPluginTransformjQuery]
+            });
+            eval(out.code.replace(/\r?\n|\r/g, ""));
+            expect($('#1').text()).eql("Clicked");
+            expect($('#2').text()).eql("Clicked");
+            done();
+        });
+    });
+
+    describe('1.5. on()', function ()
+    {
+        it('1.5.1 sets a callback on an event for a single element, returns the element', function (done)
+        {
+            document.body.innerHTML = '<input type = "text"><div></div>';
+            var out = babel.transform("var testVar = $('input').on('click',function(){  " +
+                "$('div').text('Changed');" +
+                "});" , {
+                plugins:[babelPluginTransformjQuery]
+            });
+            expect(eval(out.code.replace(/\r?\n|\r/g, "") + "testVar;")).eql($('input'));
+            // $('input').on('change',function(){
+            //     $('div').text("Changed");
+            // });
+            $("input").click();
+            expect($("div").text()).eql("Changed");
+            done();
+        });
+    });
 });
 
 
