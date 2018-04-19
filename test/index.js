@@ -147,6 +147,18 @@ describe("1. Can do basic DOM manipulation", function ()
             expect(eval(out.code.replace(/\r?\n|\r/g, "") + "testVar;")).eql('red');
             done();
         });
+
+        //This test doesnt work in jsdom for some reason
+        // it('1.3.5. Set multiple properties', function (done)
+        // {
+        //     document.body.innerHTML = '<div></div>';
+        //     var out = babel.transform("$('div').css({backgroundColor: 'black', color: 'white'});",{
+        //         plugins: [babelPluginTransformjQuery]
+        //     });
+        //     eval(out.code.replace(/\r?\n|\r/g, ""));
+        //     expect($('div').css('color')).eql('white');
+        //     expect($('div').css('background-color')).eql('black');
+        // });
     });
 
     describe("1.4. click()",function(){

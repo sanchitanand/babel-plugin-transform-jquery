@@ -1,6 +1,6 @@
 {
   "name": "babel-plugin-transform-jquery",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Transforms jQuery methods and calls into vanilla JS",
   "main": "lib/index.js",
   "keywords": [

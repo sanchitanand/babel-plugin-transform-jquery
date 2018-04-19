@@ -207,21 +207,6 @@ class jQuery_lookup
         {
 
             return this.on(path,[t.stringLiteral('click'),args[0]],refVar);
-            // if (t.isIdentifier(args[0]) || t.isFunctionExpression(args[0]))
-            // {
-            //     const statement = template(`for(var i=0;i<REFVAR.length;i++){
-            //     REFVAR[i].addEventListener('click', FUNC);
-            //     }`);
-            //     const ast = statement({
-            //         REFVAR: refVar,
-            //         FUNC: args[0]
-            //     });
-            //     return ast;
-            // }
-            // else
-            // {
-            //     throw path.buildCodeFrameError("Unexpected argument passed");
-            // }
 
         }
         else if (args.length == 2)
@@ -261,7 +246,6 @@ class jQuery_lookup
                 });
                 return ast;
             }
-
             else
             {
                 throw path.buildCodeFrameError('Unexpected argument passed');
@@ -270,8 +254,10 @@ class jQuery_lookup
 
         else if (args.length == 3)
         {
-            //TODO: add child element type
-            const statement = template(`var TEMP = ARGS2;
+            if(t.isStringLiteral(args[0]) && t.isStringLiteral(args[1]) && (t.isFunctionExpression(args[2]) || t.isIdentifier(args[2])))
+            {
+                //TODO: add child element type
+                const statement = template(`var TEMP = ARGS2;
                                         for(var i=0;i<REFVAR.length;i++){
                                         REFVAR[i].addEventListener(ARGS0,function(event){
                                             var TEMP2 = document.querySelectorAll(ARGS1);
@@ -284,15 +270,44 @@ class jQuery_lookup
                                             }
                                         });
                                         }`);
-            const ast = statement({
-                REFVAR: refVar,
-                TEMP: this.generateName(path),
-                TEMP2: this.generateName(path),
-                ARGS0: args[0],
-                ARGS1: args[1],
-                ARGS2: args[2]
-            });
-            return ast;
+                const ast = statement({
+                    REFVAR: refVar,
+                    TEMP: this.generateName(path),
+                    TEMP2: this.generateName(path),
+                    ARGS0: args[0],
+                    ARGS1: args[1],
+                    ARGS2: args[2]
+                });
+                return ast;
+            }
+            else if(t.isStringLiteral(args[0]) && t.isIdentifier(args[1]) && (t.isFunctionExpression(args[2]) || t.isIdentifier(args[2])))
+            {
+                const statement = template(`var TEMP = ARGS2;
+                                        for(var i=0;i<REFVAR.length;i++){
+                                        REFVAR[i].addEventListener(ARGS0,function(event){
+                                            for(var i=0;i< ARGS1.length;i++)
+                                            {
+                                                if(event.target === ARGS1[i])
+                                                {
+                                                    TEMP(event);
+                                                }
+                                            }
+                                        });
+                                        }`);
+                const ast = statement({
+                    REFVAR: refVar,
+                    TEMP: this.generateName(path),
+                    ARGS0: args[0],
+                    ARGS1: args[1],
+                    ARGS2: args[2]
+                });
+                return ast;
+            }
+
+            else
+            {
+                throw path.buildCodeFrameError('Unexpected argument passed');
+            }
         }
         else
         {
@@ -312,9 +327,32 @@ class jQuery_lookup
         }
         if (args.length == 1)
         {
-            if (t.isObjectExpression(args[0]))
+            if(t.isIdentifier(args[0]))
             {
-                //TODO: css dict variable
+                const statement = template(`for (var TEMP in ARGS0){
+                REFVAR.style[TEMP] = ARGS0[TEMP];
+                }`);
+                const ast= statement({
+                    REFVAR:refVar,
+                    ARGS0:args[0],
+                    TEMP:this.generateName(path)
+                });
+                return ast;
+            }
+            else if (t.isObjectExpression(args[0]))
+            {
+                const ast = [];
+                let props = args[0].properties;
+                for(let i=0;i<props.length;i++)
+                {
+                    let statement = template(`REFVAR.style.KEY = VALUE`);
+                    ast.push(statement({
+                        REFVAR: refVar,
+                        KEY: props[i].key,
+                        VALUE : props[i].value
+                    }));
+                }
+                return ast;
             }
             else if (t.isStringLiteral(args[0]))
             {
